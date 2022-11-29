@@ -1,9 +1,31 @@
-const http = require('http');
+const express = require('express');
+const expressHandlebars = require('express-handlebars');
+
+const app = express();
+
 const port = process.env.PORT || 3000;
 
-const server = http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello World!');
+app.engine('handlebars', expressHandlebars({
+    defaultLayout: 'main'
+}))
+
+app.set('view engine', 'handlebars');
+
+app.get('/', (req, res) => res.render('home'))
+
+app.get('/about', (req, res) => res.render('about'))
+
+app.use((res, req)=>{
+    res.status(404);
+    res.render('404');
 })
 
-server.listen(port, () => console.log(`сервер запущен на порте ${port}; \n нажмите CTRL+C для завершения...`))
+app.use((err, req, res, next)=>{
+    console.error(err.message);
+    res.status(500);
+    res.render('500')
+})
+
+app.listen(port, ()=>{
+    console.log(`Express запущен на http://localhost:${port}\nНажмите Ctrl+C для завершения`);
+})
